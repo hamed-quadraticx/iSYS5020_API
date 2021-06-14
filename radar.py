@@ -4,8 +4,9 @@ import binascii
 import copy
 # Importing the threading module
 import threading 
-from RadarAPI.TargetList_Interfaces.ethernet_interface import EhternetInterface
-from RadarAPI.TargetList_Interfaces.spi_interface import SPIInterface
+from iSYS5020_API.TargetList_Interfaces.ethernet_interface import EhternetInterface
+from iSYS5020_API.TargetList_Interfaces.spi_interface import SPIInterface
+from iSYS5020_API.TargetList_Interfaces.abstract_targetlist_interface import TargetList_Interface
 
 
 from .radar_enums import TargetListInterface
@@ -26,11 +27,11 @@ from .set_targetlist_Interface import SetTargetListInterface_req
 
 
 
-  
+lock = threading.Lock()
 # radar class holds all radar data and defines the configuration port which will be used to configure the radar
 class Radar :
     serial_port = None
-    lock = threading.Lock()
+    
     def __init__(self,uart_port_name,address_no):
         
         self.serial_port = serial.Serial(port=uart_port_name,
@@ -56,6 +57,7 @@ class Radar :
         self.targetlist_interface_type = TargetListInterface.off
         self._TargetList = []
         self.interface_obj = None
+       
 
 
 
@@ -71,12 +73,12 @@ class Radar :
         if chk is False :
             print('set radar target list interface failed')
             return
-        
-        if interface_obj is TargetListInterface.ETH :
-             self.interface_obj =ethernet_interface.EhternetInterface(self)
+        print(f'0101010101010101010101010----{interface_obj}')
+        if TargetListInterface(interface_obj) is TargetListInterface.ETH :
+             self.interface_obj =EhternetInterface(self)
              print(' set radar target list interface ETH !!!!')
-        elif interface_obj is TargetListInterface.SPI :
-             self.interface_obj =spi_interface.SPIInterface(self,0, 0)
+        elif TargetListInterface(interface_obj) is TargetListInterface.SPI :
+             self.interface_obj =SPIInterface(self,0, 0)
              print(' set radar target list interface SPI !!!!')
 
         
